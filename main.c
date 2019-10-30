@@ -134,7 +134,6 @@ int main() {
                 //Additional info
                 printf("Any additional info?\n");
                 gets(addInfo);
-                state++;
             }
             case 6:
             {
