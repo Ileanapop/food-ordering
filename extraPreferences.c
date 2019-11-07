@@ -17,6 +17,7 @@ void displayDrinkOptions(int noOfDrinks, char food[], char drinks[][MAX_DRINK_NA
     }
     printf("%c) Go back\n",'a'+noOfDrinks);
 }
+
 void displayCutlery(){
     printf("Do you want cutlery?\n");
     printf("a) Yes\n");

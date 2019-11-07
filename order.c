@@ -4,6 +4,7 @@
 
 #include<stdio.h>
 #include<string.h>
+
 void displayFoodData(char food[],double priceFood, char drink[], double priceDrink, char username[]){
     printf("This is your order:\n");
     printf("-------------------\n");
@@ -14,19 +15,20 @@ void displayFoodData(char food[],double priceFood, char drink[], double priceDri
         printf("---%s: (%0.2f)\n", drink, priceDrink);
     }
 }
-void showCutlery(int cutlery)
-{
+
+void showCutlery(int cutlery){
     if(cutlery==1) {
         printf("Cutlery: ");
         printf("yes\n");
     }
 }
-void showAddInfo(char info[])
-{
+
+void showAddInfo(char info[]){
     if(strcmp(info,"")!=0) {
         printf("Additional info: %s\n", info);
     }
 }
+
 void getOrderConfirmation(double priceFood, double priceDrink, int *confirmed, int *state,char username[]){
     char choice;
     printf("Payment amount (%0.2f)\n",priceFood+priceDrink);

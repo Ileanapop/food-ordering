@@ -1,21 +1,31 @@
 #include <stdio.h>
-#include<string.h>
+
 #include "food.h"
-#include "addPreferences.h"
+#include "extraPreferences.h"
 #include "order.h"
 #include "input.h"
+
 #define MAX_FOOD_NAME 15
 #define MAX_TYPE_NAME 17  //food type
 #define MAX_DRINK_NAME 15
+
 int main() {
-    char username[20], password[20], addInfo[50]="";    //User input
-    int state=0, confirmed=0,foodChoice, drinkChoice;
+
+    //User input
+    char username[20], password[20], addInfo[50]="";
+    int state=0, confirmed=0;
+    int foodChoice, drinkChoice, typeChoice, cutlery=0;
+
     // Food data
-    int noOfFood=3, noOfTypes[5]={3,2,4},typeChoice,noOfDrinks=5, cutlery=0;
+    int noOfFood=3, noOfTypes[5]={3,2,4},noOfDrinks=5;
     char food[][MAX_FOOD_NAME]={"Pizza","Pasta","Salad"};
-    char type[3][4][MAX_TYPE_NAME]={{"Pizza Carbonara","Pizza Diavola","Pizza Margherita"},{"Chicken alfredo","Mac&cheese"},{"Tuna Salad","Chicken Salad","Greek Salad","Cobb"}};
-    double prices[3][4]={{21, 23, 19},{23, 21},{23, 22, 19, 21}}, priceDrinks[7]={5,5,5,4,0};
+    char type[3][4][MAX_TYPE_NAME]={
+            {"Pizza Carbonara","Pizza Diavola","Pizza Margherita"},
+            {"Chicken alfredo","Mac&cheese"},
+            {"Tuna Salad","Chicken Salad","Greek Salad","Cobb"}};
     char drinks[][MAX_DRINK_NAME]={"Coca-cola","Fanta","Lipton","Water","No, thanks!"};
+    double prices[3][4]={{21, 23, 19},{23, 21},{23, 22, 19, 21}}, priceDrinks[7]={5,5,5,4,0};
+
     while(!confirmed){
         switch(state){
             case 0:{

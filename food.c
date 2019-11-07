@@ -14,6 +14,7 @@ void displayFoodOptions(int noOfFood, char food[][MAX_FOOD_NAME]){
     }
     printf("%c) Go back\n",'a'+noOfFood);
 }
+
 void displayFoodType(int noOfTypes, char food[],char typesFoodChosen[][MAX_TYPE_NAME],double prices[]){
     printf("Please choose the type of %s: \n",food);
     for(int i=0;i<noOfTypes;i++)

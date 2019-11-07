@@ -12,7 +12,8 @@ void inputPersonalData(char username[], char password[]){
     printf("---Password\n");
     gets(password);
 }
-int getChoiceIndex(int noOfChoices, int *state) {
+
+int getChoiceIndex(int noOfChoices, int *state){
     int choiceIndex;
     char choice = getchar();
     // consume new line
