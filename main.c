@@ -15,7 +15,6 @@ int main() {
     char username[20], password[20], addInfo[50]="";
     int state=0, confirmed=0;
     int foodChoice, drinkChoice, typeChoice, cutlery=0;
-
     // Food data
     int noOfFood=3, noOfTypes[5]={3,2,4},noOfDrinks=5;
     char food[][MAX_FOOD_NAME]={"Pizza","Pasta","Salad"};
@@ -24,7 +23,11 @@ int main() {
             {"Chicken alfredo","Mac&cheese"},
             {"Tuna Salad","Chicken Salad","Greek Salad","Cobb"}};
     char drinks[][MAX_DRINK_NAME]={"Coca-cola","Fanta","Lipton","Water","No, thanks!"};
-    double prices[3][4]={{21, 23, 19},{23, 21},{23, 22, 19, 21}}, priceDrinks[7]={5,5,5,4,0};
+    double prices[3][4]={
+            {21, 23, 19},
+            {23, 21},
+            {23, 22, 19, 21}};
+    double priceDrinks[7]={5,5,5,4,0};
 
     while(!confirmed){
         switch(state){
@@ -57,9 +60,7 @@ int main() {
                 addAdditionalInformation(addInfo);
             }
             case 6:{
-                displayFoodData(type[foodChoice][typeChoice],prices[foodChoice][typeChoice],drinks[drinkChoice], priceDrinks[drinkChoice], username);
-                showCutlery(cutlery);
-                showAddInfo(addInfo);
+                displayOrder(type[foodChoice][typeChoice],prices[foodChoice][typeChoice],drinks[drinkChoice], priceDrinks[drinkChoice], username, cutlery, addInfo);
                 getOrderConfirmation(prices[foodChoice][typeChoice], priceDrinks[drinkChoice], &confirmed, &state, username);
                 break;
             }

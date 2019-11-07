@@ -8,6 +8,7 @@
 void displayFoodData(char food[],double priceFood, char drink[], double priceDrink, char username[]);
 void showCutlery(int cutlery);
 void showAddInfo(char info[]);
+void displayOrder(char food[],double priceFood, char drink[], double priceDrink, char username[], int cutlery, char info[]);
 void getOrderConfirmation(double priceFood, double priceDrink, int *confirmed, int *state,char username[]);
 
 #endif //FOOD_ORDERING_ORDER_H

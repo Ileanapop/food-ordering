@@ -29,6 +29,12 @@ void showAddInfo(char info[]){
     }
 }
 
+void displayOrder(char food[],double priceFood, char drink[], double priceDrink, char username[], int cutlery, char info[]){
+    displayFoodData(food,priceFood,drink,priceDrink,username);
+    showCutlery(cutlery);
+    showAddInfo(info);
+}
+
 void getOrderConfirmation(double priceFood, double priceDrink, int *confirmed, int *state,char username[]){
     char choice;
     printf("Payment amount (%0.2f)\n",priceFood+priceDrink);
