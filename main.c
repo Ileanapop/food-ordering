@@ -1,33 +1,38 @@
 #include <stdio.h>
-
+#include<stdlib.h>
 #include "food.h"
 #include "extraPreferences.h"
 #include "order.h"
 #include "input.h"
+#include "dataInput.h"
 
-#define MAX_FOOD_NAME 15
-#define MAX_TYPE_NAME 17  //food type
-#define MAX_DRINK_NAME 15
+#define LOAD_DATA "Please load the data\n"
+#define MAX_LINE 5
+
+void readNoOfEachCategory(char line[], int *no);   // Category: food or drink
 
 int main() {
 
     //User input
-    char username[20], password[20], addInfo[50]="";
+    char username[20], password[20], addInfo[50]="",line[MAX_LINE]="";
     int state=0, confirmed=0;
     int foodChoice, drinkChoice, typeChoice, cutlery=0;
     // Food data
-    int noOfFood=3, noOfTypes[5]={3,2,4},noOfDrinks=5;
-    char food[][MAX_FOOD_NAME]={"Pizza","Pasta","Salad"};
-    char type[3][4][MAX_TYPE_NAME]={
-            {"Pizza Carbonara","Pizza Diavola","Pizza Margherita"},
-            {"Chicken alfredo","Mac&cheese"},
-            {"Tuna Salad","Chicken Salad","Greek Salad","Cobb"}};
-    char drinks[][MAX_DRINK_NAME]={"Coca-cola","Fanta","Lipton","Water","No, thanks!"};
-    double prices[3][4]={
-            {21, 23, 19},
-            {23, 21},
-            {23, 22, 19, 21}};
-    double priceDrinks[7]={5,5,5,4,0};
+    int noOfFood,noOfDrinks;
+
+    printf(LOAD_DATA);
+
+    readNoOfEachCategory(line,&noOfFood);
+    char ** food = (char**)malloc(noOfFood * sizeof(char*));
+    char *** types = (char***)malloc(noOfFood * sizeof(char**));
+    double ** prices = (double**)malloc(noOfFood * sizeof(double*));
+    int * noOfTypes = (int*)malloc(noOfFood * sizeof(int));
+    loadFoodData(noOfFood,food,types,prices,noOfTypes);
+
+    readNoOfEachCategory(line,&noOfDrinks);
+    char ** drinks = (char**)malloc(noOfDrinks * sizeof(char*));
+    double * priceDrinks = (double*)malloc(noOfDrinks * sizeof(double));
+    loadDrinksData(drinks,priceDrinks);
 
     while(!confirmed){
         switch(state){
@@ -42,13 +47,13 @@ int main() {
                 break;
             }
             case 2:{
-                displayFoodType(noOfTypes[foodChoice],food[foodChoice],type[foodChoice],prices[foodChoice]);
+                displayFoodType(noOfTypes[foodChoice],food[foodChoice],types[foodChoice],prices[foodChoice]);
                 typeChoice = getChoiceIndex(noOfTypes[foodChoice],&state);
                 break;
             }
             case 3:{
                 displayDrinkOptions(noOfDrinks,food[foodChoice],drinks,priceDrinks);
-                drinkChoice = getChoiceIndex(noOfDrinks, &state);
+                drinkChoice = getChoiceIndex(noOfDrinks+1, &state);
                 break;
             }
             case 4:{
@@ -60,11 +65,17 @@ int main() {
                 addAdditionalInformation(addInfo);
             }
             case 6:{
-                displayOrder(type[foodChoice][typeChoice],prices[foodChoice][typeChoice],drinks[drinkChoice], priceDrinks[drinkChoice], username, cutlery, addInfo);
-                getOrderConfirmation(prices[foodChoice][typeChoice], priceDrinks[drinkChoice], &confirmed, &state, username);
+                displayOrder(types[foodChoice][typeChoice],prices[foodChoice][typeChoice],drinks[drinkChoice], priceDrinks[drinkChoice], username, cutlery, addInfo,drinkChoice,noOfDrinks);
+                getOrderConfirmation(prices[foodChoice][typeChoice], priceDrinks[drinkChoice],drinkChoice,noOfDrinks,&confirmed, &state, username);
                 break;
             }
         }
     }
+    freeFoodMemory(noOfFood,food,noOfTypes,types,prices);
+    freeDrinksMemory(noOfDrinks, drinks,priceDrinks);
     return 0;
+}
+void readNoOfEachCategory(char line[], int *no){
+    gets(line);
+    *no = line[0]-'0';
 }

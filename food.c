@@ -2,10 +2,9 @@
 // Created by ileana on 11/6/2019.
 //
 #include<stdio.h>
-#define MAX_FOOD_NAME 15
-#define MAX_TYPE_NAME 17  //food type
 
-void displayFoodOptions(int noOfFood, char food[][MAX_FOOD_NAME]){
+
+void displayFoodOptions(int noOfFood, char ** food){
     printf("Please choose the food you feel like eating today:\n");
     for(int i=0;i<noOfFood;i++)
     {
@@ -15,7 +14,7 @@ void displayFoodOptions(int noOfFood, char food[][MAX_FOOD_NAME]){
     printf("%c) Go back\n",'a'+noOfFood);
 }
 
-void displayFoodType(int noOfTypes, char food[],char typesFoodChosen[][MAX_TYPE_NAME],double prices[]){
+void displayFoodType(int noOfTypes, char * food,char ** typesFoodChosen,double * prices){
     printf("Please choose the type of %s: \n",food);
     for(int i=0;i<noOfTypes;i++)
     {
