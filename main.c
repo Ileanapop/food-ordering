@@ -7,9 +7,9 @@
 #include "dataInput.h"
 
 #define LOAD_DATA "Please load the data\n"
-#define MAX_LINE 5
+#define MAX_LINE 10
 
-void readNoOfEachCategory(char line[], int *no);   // Category: food or drink
+void readNoOfEachCategory(FILE *pFile, char line[], int *no);   // Category: food or drink
 
 int main() {
 
@@ -20,19 +20,25 @@ int main() {
     // Food data
     int noOfFood,noOfDrinks;
 
-    printf(LOAD_DATA);
+    FILE *fptr;
+    fptr = fopen("D:\\CP\\food-ordering\\data.txt","r");
+    if(fptr==NULL){
+        printf(LOAD_DATA);
+        fptr=stdin;
+    }
 
-    readNoOfEachCategory(line,&noOfFood);
+    readNoOfEachCategory(fptr,line,&noOfFood);
+
     char ** food = (char**)malloc(noOfFood * sizeof(char*));
     char *** types = (char***)malloc(noOfFood * sizeof(char**));
     double ** prices = (double**)malloc(noOfFood * sizeof(double*));
     int * noOfTypes = (int*)malloc(noOfFood * sizeof(int));
-    loadFoodData(noOfFood,food,types,prices,noOfTypes);
+    loadFoodData(fptr,noOfFood,food,types,prices,noOfTypes);
 
-    readNoOfEachCategory(line,&noOfDrinks);
+    readNoOfEachCategory(fptr,line,&noOfDrinks);
     char ** drinks = (char**)malloc(noOfDrinks * sizeof(char*));
     double * priceDrinks = (double*)malloc(noOfDrinks * sizeof(double));
-    loadDrinksData(drinks,priceDrinks);
+    loadDrinksData(fptr,drinks,priceDrinks);
 
     while(!confirmed){
         switch(state){
@@ -73,9 +79,10 @@ int main() {
     }
     freeFoodMemory(noOfFood,food,noOfTypes,types,prices);
     freeDrinksMemory(noOfDrinks, drinks,priceDrinks);
+    fclose(fptr);
     return 0;
 }
-void readNoOfEachCategory(char line[], int *no){
-    gets(line);
+void readNoOfEachCategory(FILE * pFile, char line[], int *no){
+    fgets(line,MAX_LINE,pFile);
     *no = line[0]-'0';
 }

@@ -6,8 +6,8 @@
 #include<stdlib.h>
 #include<string.h>
 
-#define MAX_FOOD_NAME 15
-#define MAX_TYPE_NAME 17
+#define MAX_FOOD_NAME 20
+#define MAX_TYPE_NAME 25
 #define MAX_LINE 100
 #define MAX_DRINK_NAME 15
 
@@ -18,18 +18,18 @@ void readSpecificFoodsAndPrice(char * line, char * type, double *price);
 double returnPrice(char * str);
 unsigned int returnPositionOfLastDelimiter(char * str, char delimiter);
 
-void loadFoodData(int noOfFood,char ** food, char *** types, double ** prices, int *noOfTypes){
+void loadFoodData(FILE * pFile, int noOfFood,char ** food, char *** types, double ** prices, int *noOfTypes){
     char line[MAX_LINE];
     for(int i=0;i<noOfFood;i++){
-        gets(line);
+        fgets(line,MAX_LINE,pFile);
         food[i] = (char*)malloc(MAX_FOOD_NAME* sizeof(char));
         parseLineFood(line,i,food,types,prices,noOfTypes);
     }
 }
 
-void loadDrinksData(char ** drinks, double * prices){
+void loadDrinksData(FILE * pFile, char ** drinks, double * prices){
     char line[MAX_LINE],*p;
-    gets(line);
+    fgets(line,MAX_LINE,pFile);
     int crtDrinkNo=0;   //no of the drink read at the moment
     for(p=strtok(line,"(");p!=0;p=strtok(NULL,"(")){
         drinks[crtDrinkNo] = (char*)malloc(MAX_DRINK_NAME * sizeof(char));
