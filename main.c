@@ -26,7 +26,6 @@ int main() {
         printf(LOAD_DATA);
         fptr=stdin;
     }
-
     readNoOfEachCategory(fptr,line,&noOfFood);
 
     char ** food = (char**)malloc(noOfFood * sizeof(char*));
@@ -36,6 +35,7 @@ int main() {
     loadFoodData(fptr,noOfFood,food,types,prices,noOfTypes);
 
     readNoOfEachCategory(fptr,line,&noOfDrinks);
+
     char ** drinks = (char**)malloc(noOfDrinks * sizeof(char*));
     double * priceDrinks = (double*)malloc(noOfDrinks * sizeof(double));
     loadDrinksData(fptr,drinks,priceDrinks);
@@ -83,6 +83,6 @@ int main() {
     return 0;
 }
 void readNoOfEachCategory(FILE * pFile, char line[], int *no){
-    fgets(line,MAX_LINE,pFile);
-    *no = line[0]-'0';
+    fscanf(pFile,"%d %s",no,line);
+    fgetc(pFile);
 }

@@ -6,14 +6,14 @@
 #include<stdlib.h>
 #include<string.h>
 
+
 #define MAX_FOOD_NAME 20
 #define MAX_TYPE_NAME 25
 #define MAX_LINE 100
 #define MAX_DRINK_NAME 15
 
 void parseLineFood(char * line, int i, char ** food, char *** types, double ** prices, int *noOfTypes);
-void readType(char * line, char * type);
-int returnNoOfTypes(char * line);
+void readType(char * line, char * type, int *no);
 void readSpecificFoodsAndPrice(char * line, char * type, double *price);
 double returnPrice(char * str);
 unsigned int returnPositionOfLastDelimiter(char * str, char delimiter);
@@ -40,9 +40,7 @@ void loadDrinksData(FILE * pFile, char ** drinks, double * prices){
 
 void parseLineFood(char * line, int i, char ** food,char *** types, double ** prices, int *noOfTypes){
     char *str="";
-    readType(line,food[i]);
-    strcpy(str,line);
-    noOfTypes[i]=returnNoOfTypes(str);
+    readType(line,food[i],&noOfTypes[i]);
     types[i] = (char**)malloc(noOfTypes[i] * sizeof(char*));
     prices[i] = (double*)malloc(noOfTypes[i] * sizeof(double));
     for (int j = 0; j < noOfTypes[i]; j++) {
@@ -55,23 +53,20 @@ void parseLineFood(char * line, int i, char ** food,char *** types, double ** pr
     }
 }
 
-void readType(char * line, char * type){
+void readType(char * line, char * type, int * no){
     int i=0;
-    while(line[i]!=':'){
+    while(line[i]!=' '){
         type[i]=line[i];
         i++;
     }
     type[i]='\0';
-    strcpy(line,line+i+2);  // delete the type of food, the character :  and the space following it
-}
-
-int returnNoOfTypes(char * line){
-    char *str;
-    int count=0;
-    for(str=strtok(line,"(");str!=0;str=strtok(NULL,"(")) {
-        count++;
+    i++;
+    *no=0;
+    while(line[i]!=':'){
+        *no= (*no)*10+line[i]-'0';
+        i++;
     }
-    return count;
+    strcpy(line,line+i+2);  // delete the type of food, the character :  and the space following it
 }
 
 unsigned int returnPositionOfLastDelimiter(char * str, char delimiter){
@@ -84,6 +79,7 @@ unsigned int returnPositionOfLastDelimiter(char * str, char delimiter){
     }
     return k;
 }
+
 void readSpecificFoodsAndPrice(char * line, char * type, double *price){
     unsigned int k=returnPositionOfLastDelimiter(line,'-');
     strncpy(type,line,k);
