@@ -3,11 +3,12 @@
 #include "food.h"
 #include "extraPreferences.h"
 #include "order.h"
-#include "input.h"
+#include "userIdentification.h"
 #include "dataInput.h"
 
 #define LOAD_DATA "Please load the data\n"
 #define MAX_LINE 10
+#define MAX_USERNAME 50
 
 void readNoOfEachCategory(FILE *pFile, char line[], int *no);   // Category: food or drink
 
@@ -15,6 +16,8 @@ int main() {
 
     //User input
     char username[20], password[20], addInfo[50]="",line[MAX_LINE]="";
+    char existingNames[25][50]={"admin"},existingPasswords[25][50]={"admin"};
+    int noOfUsers=1;
     int state=0, confirmed=0;
     int foodChoice, drinkChoice, typeChoice, cutlery=0;
     // Food data
@@ -40,10 +43,11 @@ int main() {
     double * priceDrinks = (double*)malloc(noOfDrinks * sizeof(double));
     loadDrinksData(fptr,drinks,priceDrinks);
 
+    printf("Welcome to Food Thingies!\n");
     while(!confirmed){
         switch(state){
             case 0:{
-                inputPersonalData(username, password);
+                signInOrUp(existingNames,&noOfUsers,username,existingPasswords,password);
                 state++;
                 break;
             }

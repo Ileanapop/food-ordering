@@ -8,5 +8,6 @@
 
 void displayFoodOptions(int noOfFood, char ** food);
 void displayFoodType(int noOfTypes, char * food,char ** typesFoodChosen,double * prices);
+int getChoiceIndex(int noOfChoices, int *state);
 
 #endif //FOOD_ORDERING_FOOD_H

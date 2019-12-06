@@ -23,3 +23,18 @@ void displayFoodType(int noOfTypes, char * food,char ** typesFoodChosen,double *
     }
     printf("%c) Go back\n",noOfTypes+'a');
 }
+
+int getChoiceIndex(int noOfChoices, int *state){
+    int choiceIndex;
+    char choice = getchar();
+    // consume new line
+    getchar();
+    choiceIndex = choice-'a';
+    if(choice == 'a'+noOfChoices) {
+        (*state)--; // *state-- <=> *(state--)
+    } else {
+        choiceIndex = choice - 'a';
+        (*state)++;
+    }
+    return choiceIndex;
+}
