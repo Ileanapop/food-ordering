@@ -6,6 +6,7 @@
 #define FOOD_ORDERING_USERIDENTIFICATION_H
 
 
-void signInOrUp(char existingNames[][50],int *noOfUsers,char username[],char existingPasswords[][50], char password[]);
+void signInOrUp(FILE * fptr, char ** existingNames,int *noOfUsers,char username[],char ** existingPasswords, char password[], char * plainText, char * cipherText);
+void readData(FILE * fptr,char * plainText, char * cipherText, int noOfUsers,char ** usernames, char ** passwords);
 
 #endif //FOOD_ORDERING_USERIDENTIFICATION_H

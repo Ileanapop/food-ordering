@@ -7,8 +7,8 @@
 #include "dataInput.h"
 
 #define LOAD_DATA "Please load the data\n"
-#define MAX_LINE 10
-#define MAX_USERNAME 50
+#define MAX_LINE 100
+#define MAX_LEN 39
 
 void readNoOfEachCategory(FILE *pFile, char line[], int *no);   // Category: food or drink
 
@@ -16,8 +16,9 @@ int main() {
 
     //User input
     char username[20], password[20], addInfo[50]="",line[MAX_LINE]="";
-    char existingNames[25][50]={"admin"},existingPasswords[25][50]={"admin"};
-    int noOfUsers=1;
+    char ** existingNames, ** existingPasswords;
+    char *plainText,*cipherText;
+    int noOfUsers;
     int state=0, confirmed=0;
     int foodChoice, drinkChoice, typeChoice, cutlery=0;
     // Food data
@@ -44,10 +45,27 @@ int main() {
     loadDrinksData(fptr,drinks,priceDrinks);
 
     printf("Welcome to Food Thingies!\n");
+    FILE * pFile;
+    pFile = fopen("D:\\CP\\food-ordering\\accounts.txt","r+");
+    plainText=(char *)malloc(MAX_LEN*sizeof(char));
+    cipherText=(char *)malloc(MAX_LEN*sizeof(char));
+
+    fgets(cipherText,MAX_LINE,pFile);
+    cipherText[MAX_LEN]='\0';
+    fscanf(pFile,"%d",&noOfUsers);
+    fgetc(pFile);
+
+    existingNames=(char **)malloc(noOfUsers*sizeof(char*));
+    existingPasswords=(char **)malloc(noOfUsers*sizeof(char*));
+
+    readData(pFile,plainText,cipherText,noOfUsers,existingNames,existingPasswords);
+    //for(int i=0;i<noOfUsers;i++)
+      //  printf("%s* %s*\n",existingNames[i],existingPasswords[i]);
+
     while(!confirmed){
         switch(state){
             case 0:{
-                signInOrUp(existingNames,&noOfUsers,username,existingPasswords,password);
+                signInOrUp(pFile,existingNames,&noOfUsers,username,existingPasswords,password,plainText,cipherText);
                 state++;
                 break;
             }
@@ -81,9 +99,19 @@ int main() {
             }
         }
     }
+    fclose(fptr);
+    fclose(pFile);
     freeFoodMemory(noOfFood,food,noOfTypes,types,prices);
     freeDrinksMemory(noOfDrinks, drinks,priceDrinks);
-    fclose(fptr);
+    //free(plainText);
+    //free(cipherText);
+    for(int i=0;i<noOfUsers;i++){
+        free(existingNames[i]);
+        free(existingPasswords[i]);
+    }
+    free(existingNames);
+    free(existingPasswords);
+
     return 0;
 }
 void readNoOfEachCategory(FILE * pFile, char line[], int *no){

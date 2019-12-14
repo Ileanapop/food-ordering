@@ -7,8 +7,8 @@
 #define MAX_USERNAME 50
 
 
-int validUsername(char existingNames[][MAX_USERNAME],int noOfUsers, char username[],char existingPasswords[][MAX_USERNAME],char password[]);
-int verifyDuplicateUser(char users[][MAX_USERNAME], int noOfUsers, char username[]);
+int validUsername(char ** existingNames,int noOfUsers, char username[],char ** existingPasswords,char password[]);
+int verifyDuplicateUser(char ** users, int noOfUsers, char username[]);
 int isLength(char s[]);
 int containsUsername(char password[], char username[]);
 int containsSpecialCharacters(char s[]);
