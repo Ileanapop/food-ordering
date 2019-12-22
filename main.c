@@ -3,20 +3,22 @@
 #include "food.h"
 #include "extraPreferences.h"
 #include "order.h"
-#include "userIdentification.h"
-#include "dataInput.h"
+#include "user.h"
+#include "type.h"
 
 #define LOAD_DATA "Please load the data\n"
 #define MAX_LINE 100
 #define MAX_LEN 39
 
+
 void readNoOfEachCategory(FILE *pFile, char line[], int *no);   // Category: food or drink
+void freeData(int noOfFood, food * foods, type * drinks);
+int getChoiceIndex(int noOfChoices, int *state);
 
 int main() {
 
-    //User input
+    // User input
     char username[20], password[20], addInfo[50]="",line[MAX_LINE]="";
-    char ** existingNames, ** existingPasswords;
     char *plainText,*cipherText;
     int noOfUsers;
     int state=0, confirmed=0;
@@ -31,18 +33,15 @@ int main() {
         fptr=stdin;
     }
     readNoOfEachCategory(fptr,line,&noOfFood);
+    food *foods = (food *)malloc(noOfFood*sizeof(food));
 
-    char ** food = (char**)malloc(noOfFood * sizeof(char*));
-    char *** types = (char***)malloc(noOfFood * sizeof(char**));
-    double ** prices = (double**)malloc(noOfFood * sizeof(double*));
-    int * noOfTypes = (int*)malloc(noOfFood * sizeof(int));
-    loadFoodData(fptr,noOfFood,food,types,prices,noOfTypes);
+    loadFoodData(fptr,noOfFood,foods);
 
     readNoOfEachCategory(fptr,line,&noOfDrinks);
 
-    char ** drinks = (char**)malloc(noOfDrinks * sizeof(char*));
-    double * priceDrinks = (double*)malloc(noOfDrinks * sizeof(double));
-    loadDrinksData(fptr,drinks,priceDrinks);
+    type * drinks = (type *)malloc(noOfDrinks* sizeof(type));
+
+    loadDrinksData(fptr,drinks);
 
     printf("Welcome to Food Thingies!\n");
     FILE * pFile;
@@ -55,66 +54,81 @@ int main() {
     fscanf(pFile,"%d",&noOfUsers);
     fgetc(pFile);
 
-    existingNames=(char **)malloc(noOfUsers*sizeof(char*));
-    existingPasswords=(char **)malloc(noOfUsers*sizeof(char*));
+    user * existingUsers = (user *)malloc(noOfUsers*sizeof(user));
 
-    readData(pFile,plainText,cipherText,noOfUsers,existingNames,existingPasswords);
-    //for(int i=0;i<noOfUsers;i++)
-      //  printf("%s* %s*\n",existingNames[i],existingPasswords[i]);
+    readData(pFile,plainText,cipherText,noOfUsers,existingUsers);
+
+    enum State {
+        SIGN_IN, CHOOSE_FOOD, CHOOSE_TYPE, CHOOSE_DRINK, CHOOSE_CUTLERY, INPUT_ADD_INFO, CONFIRM_ORDER
+    };
 
     while(!confirmed){
         switch(state){
-            case 0:{
-                signInOrUp(pFile,existingNames,&noOfUsers,username,existingPasswords,password,plainText,cipherText);
+            case SIGN_IN:{
+                signInOrUp(pFile,&existingUsers,&noOfUsers,username,password,plainText,cipherText);
                 state++;
                 break;
             }
-            case 1:{
-                displayFoodOptions(noOfFood,food);
+            case CHOOSE_FOOD:{
+                displayFoodOptions(noOfFood,foods);
                 foodChoice= getChoiceIndex(noOfFood,&state);
                 break;
             }
-            case 2:{
-                displayFoodType(noOfTypes[foodChoice],food[foodChoice],types[foodChoice],prices[foodChoice]);
-                typeChoice = getChoiceIndex(noOfTypes[foodChoice],&state);
+            case CHOOSE_TYPE:{
+                displayFoodType(foods[foodChoice].noOfTypes,foods[foodChoice].name,foods[foodChoice].types);
+                typeChoice = getChoiceIndex(foods[foodChoice].noOfTypes,&state);
                 break;
             }
-            case 3:{
-                displayDrinkOptions(noOfDrinks,food[foodChoice],drinks,priceDrinks);
+            case CHOOSE_DRINK:{
+                displayDrinkOptions(noOfDrinks,foods[foodChoice].name,drinks);
                 drinkChoice = getChoiceIndex(noOfDrinks+1, &state);
                 break;
             }
-            case 4:{
+            case CHOOSE_CUTLERY:{
                 displayCutlery();
                 cutlery=getChoiceIndex(2,&state)+1;
                 break;
             }
-            case 5:{
+            case INPUT_ADD_INFO:{
                 addAdditionalInformation(addInfo);
             }
-            case 6:{
-                displayOrder(types[foodChoice][typeChoice],prices[foodChoice][typeChoice],drinks[drinkChoice], priceDrinks[drinkChoice], username, cutlery, addInfo,drinkChoice,noOfDrinks);
-                getOrderConfirmation(prices[foodChoice][typeChoice], priceDrinks[drinkChoice],drinkChoice,noOfDrinks,&confirmed, &state, username);
+            case CONFIRM_ORDER:{
+                order item = createOrder(foods[foodChoice].types[typeChoice].name,foods[foodChoice].types[typeChoice].price,drinks[drinkChoice].name, drinks[drinkChoice].price,drinkChoice,noOfDrinks);
+                displayOrder(&item, username, cutlery, addInfo,drinkChoice,noOfDrinks);
+                getOrderConfirmation(foods[foodChoice].types[typeChoice].price, drinks[drinkChoice].price,drinkChoice,noOfDrinks,&confirmed, &state, username);
                 break;
             }
         }
     }
     fclose(fptr);
     fclose(pFile);
-    freeFoodMemory(noOfFood,food,noOfTypes,types,prices);
-    freeDrinksMemory(noOfDrinks, drinks,priceDrinks);
-    //free(plainText);
-    //free(cipherText);
-    for(int i=0;i<noOfUsers;i++){
-        free(existingNames[i]);
-        free(existingPasswords[i]);
-    }
-    free(existingNames);
-    free(existingPasswords);
-
+    freeData(noOfFood,foods,drinks);
+    freeUsers(existingUsers,noOfUsers);
     return 0;
 }
+
+int getChoiceIndex(int noOfChoices, int *state){
+    int choiceIndex;
+    char choice = getchar();
+    // consume new line
+    getchar();
+    choiceIndex = choice-'a';
+    if(choice == 'a'+noOfChoices) {
+        (*state)--; // *state-- <=> *(state--)
+    } else {
+        choiceIndex = choice - 'a';
+        (*state)++;
+    }
+    return choiceIndex;
+}
+
 void readNoOfEachCategory(FILE * pFile, char line[], int *no){
     fscanf(pFile,"%d %s",no,line);
     fgetc(pFile);
+}
+
+void freeData(int noOfFood, food * foods, type * drinks){
+    freeFood(foods, noOfFood);
+    freeType(drinks);
+    free(drinks);
 }

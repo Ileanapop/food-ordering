@@ -6,8 +6,17 @@
 #define FOOD_ORDERING_FOOD_H
 
 
-void displayFoodOptions(int noOfFood, char ** food);
-void displayFoodType(int noOfTypes, char * food,char ** typesFoodChosen,double * prices);
-int getChoiceIndex(int noOfChoices, int *state);
+#include "type.h"
+
+typedef struct _food{
+    char * name;
+    int noOfTypes;
+    type * types;
+}food;
+
+void loadFoodData(FILE * pFile, int noOfFood,food * foods);
+void displayFoodOptions(int noOfFood, food * foods);
+food createFood();
+void freeFood(food * foods, int noOfFood);
 
 #endif //FOOD_ORDERING_FOOD_H

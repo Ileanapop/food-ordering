@@ -4,24 +4,25 @@
 #include<stdio.h>
 #include<string.h>
 #include <ctype.h>
+#include "user.h"
 
 #define MAX_USERNAME 50
 #define MIN_LENGTH 7
 #define ERROR_PASSWORD_NOT_USERNAME "The password must not contain the username\n"
 
-int validUsername(char ** existingNames,int noOfUsers, char username[],char ** existingPasswords, char password[]) {
+int validUsername(user * existingUsers,int noOfUsers, char username[], char password[]) {
     for (int i = 0; i < noOfUsers; i++) {
-        if (strcmp(existingNames[i], username) == 0) {
-            strcpy(password,existingPasswords[i]);
+        if (strcmp(existingUsers[i].username, username) == 0) {
+            strcpy(password,existingUsers[i].password);
             return 1;
         }
     }
     return 0;
 }
 
-int verifyDuplicateUser(char ** users, int noOfUsers, char username[]){
+int verifyDuplicateUser(user * existingUsers, int noOfUsers, char username[]){
     for(int i=0;i<noOfUsers;i++) {
-        if (strcmp(username, users[i]) == 0)
+        if (strcmp(username, existingUsers[i].username) == 0)
             return 0;
     }
     return 1;
