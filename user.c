@@ -9,6 +9,7 @@
 #include<stdlib.h>
 
 #include "validationRules.h"
+#include "user.h"
 
 #define SIGN_IN_UP "Do you want to sign in or sign up?\n"
 #define SIGN_IN "Sign in\n"
@@ -26,62 +27,68 @@
 #define MAX_LEN 39
 #define MAX_LINE 100
 
-void signingIn(FILE * fptr, char ** existingNames,int noOfUsers,char username[],char ** existingPasswords, char password[],char * plainText, char *cipherText);
-void singingUp(char ** users, int noOfUsers, char username[],char password[]);
-void addNewUser(char ** existingUsers, char ** existingPasswords, int noOfUsers, char username[], char password[], char * plainText, char * cipherText);
-
+void signingIn(FILE * fptr, user * existingUsers,int noOfUsers,char username[], char password[], char * plainText, char *cipherText);
+void singingUp(user * existingUsers, int noOfUsers, char username[],char password[]);
+void addNewUser(user * newExistingUsers, user * existingUsers, int noOfUsers, char username[], char password[], char * plainText, char * cipherText);
+user createUser();
 
 void generateCharacters(char * plainText);
 void decrypt(char * plainText, char * cipherText, char password[]);
 void encrypt(char * plainText, char * cipherText, char password[]);
 
-void signInOrUp(FILE * fptr, char ** existingNames,int *noOfUsers,char username[], char ** existingPasswords,char password[], char * plainText, char * cipherText){
+void signInOrUp(FILE * fptr, user ** existingUsers, int *noOfUsers,char * username,char * password, char * plainText, char * cipherText){
     printf(SIGN_IN_UP);
     printf("a) %s",SIGN_IN);
     printf("b) %s",SIGN_UP);
     char c = getchar();
     getchar();
     if (c == 'a'){
-        signingIn(fptr, existingNames,*noOfUsers,username,existingPasswords,password,plainText,cipherText);
+        signingIn(fptr, *existingUsers,*noOfUsers,username,password,plainText,cipherText);
     }
     else {
-        singingUp(existingNames, *noOfUsers, username, password);
+        singingUp(*existingUsers, *noOfUsers, username, password);
         (*noOfUsers)++;
         fseek(fptr,41,SEEK_SET);
         fprintf(fptr,"%d",*noOfUsers);
         fclose(fptr);
         fptr = fopen("D:\\CP\\food-ordering\\accounts.txt","a");
-        addNewUser(existingNames,existingPasswords,*noOfUsers,username,password,plainText,cipherText);
+
+        user * newExistingUsers= (user *)malloc(*noOfUsers * sizeof(user));
+        addNewUser(newExistingUsers,*existingUsers,*noOfUsers,username,password,plainText,cipherText);
+        freeUsers(*existingUsers,(*noOfUsers)-1);
+        //existingUsers=NULL;
+        *existingUsers=newExistingUsers;
+        newExistingUsers=NULL;
         fprintf(fptr,"\n%s %s",username,password);
         fclose(fptr);
         fptr = fopen("D:\\CP\\food-ordering\\accounts.txt","r+");
     }
 }
 
-void signingIn(FILE * fptr, char  ** existingNames,int noOfUsers,char username[],char ** existingPasswords, char password[],char * plainText, char * cipherText){
+void signingIn(FILE * fptr, user * existingUsers,int noOfUsers,char username[], char password[],char * plainText, char * cipherText){
     printf(SIGNING_IN);
     printf("---Username\n");
     gets(username);
     printf("---Password\n");
     char pass[50];
     gets(pass);
-    if(validUsername(existingNames, noOfUsers,username, existingPasswords,password)==0){
+    if(validUsername(existingUsers, noOfUsers,username,password)==0){
         printf(USER_NOT_FOUND);
-        signInOrUp(fptr,existingNames,&noOfUsers,username, existingPasswords,password,plainText,cipherText);
+        signInOrUp(fptr,&existingUsers,&noOfUsers,username,password,plainText,cipherText);
     }
     else {
         if (strcmp(pass, password) != 0) {
             printf(INCORRECT_PASSWORD);
-            signingIn(fptr, existingNames, noOfUsers, username, existingPasswords, password,plainText,cipherText);
+            signingIn(fptr, existingUsers, noOfUsers, username, password,plainText,cipherText);
         }
     }
 }
 
-void singingUp(char ** users, int noOfUsers, char username[],char password[]){
+void singingUp(user * existingUsers, int noOfUsers, char username[],char password[]){
     printf(SIGNING_UP);
     printf("---Username\n");
     gets(username);
-    while(verifyDuplicateUser(users,noOfUsers, username)==0){
+    while(verifyDuplicateUser(existingUsers,noOfUsers, username)==0){
         printf(DUPLICATE_USER);
         printf("---Username\n");
         gets(username);
@@ -96,40 +103,35 @@ void singingUp(char ** users, int noOfUsers, char username[],char password[]){
     }
 }
 
-void addNewUser(char ** existingUsers, char ** existingPasswords, int noOfUsers, char username[], char password[], char * plainText, char * cipherText){
-    //printf("Memory Address existing users before realloc: %p\n",existingUsers);
-    existingUsers= (char **)realloc(existingUsers,noOfUsers*sizeof(char*));
-    //printf("Memory Address existing users after realloc: %p\n",existingUsers);
-    existingUsers[noOfUsers-1] = NULL;
-    for(int i=0;i<noOfUsers;i++) {
-        existingUsers[i] = (char *) realloc(existingUsers[i], MAX_USERNAME * sizeof(char));
+void addNewUser(user * newExistingUsers, user * existingUsers, int noOfUsers, char username[], char password[], char * plainText, char * cipherText){
+    for(int i=0;i<noOfUsers-1;i++)
+    {
+        newExistingUsers[i].username=(char *) malloc(MAX_USERNAME * sizeof(char));
+        newExistingUsers[i].password=(char *) malloc(MAX_USERNAME * sizeof(char));
+        strcpy(newExistingUsers[i].username,existingUsers[i].username);
+        strcpy(newExistingUsers[i].password,existingUsers[i].password);
     }
-    strcpy(existingUsers[noOfUsers-1],username);
-    //printf("Memory Address existing passwords before realloc: %p\n",existingPasswords);
-    existingPasswords= (char **)realloc(existingPasswords,noOfUsers*sizeof(char*));
-    existingPasswords[noOfUsers-1] = NULL;
-    for(int i=0;i<noOfUsers;i++) {
-        existingPasswords[i] = (char *) realloc(existingPasswords[i], MAX_USERNAME * sizeof(char));
-    }
-    //printf("Memory Address existing passwords after realloc: %p\n",existingPasswords);
+    newExistingUsers[noOfUsers-1].username=(char *) malloc(MAX_USERNAME * sizeof(char));
+    strcpy(newExistingUsers[noOfUsers-1].username,username);
+    newExistingUsers[noOfUsers-1].password=(char *) malloc(MAX_USERNAME * sizeof(char));
+    strcpy(newExistingUsers[noOfUsers-1].password,password);
     encrypt(plainText,cipherText,password);
-    strcpy(existingPasswords[noOfUsers-1],password);
 }
-void readData(FILE * fptr,char * plainText, char * cipherText, int noOfUsers,char ** usernames, char ** passwords){
+void readData(FILE * fptr,char * plainText, char * cipherText, int noOfUsers,user * existingUsers){
 
     generateCharacters(plainText);
     char line[MAX_LINE];
     for(int i=0;i<noOfUsers;i++)
     {
         fgets(line,MAX_LINE,fptr);
+        existingUsers[i]=createUser();
         char *p;
         p=strtok(line," ");
-        usernames[i]=(char *)malloc(MAX_USERNAME*sizeof(char));
-        strcpy(usernames[i],p);
+        strcpy(existingUsers[i].username,p);
+
         p=strtok(NULL," \n");
-        passwords[i]=(char *)malloc(MAX_USERNAME*sizeof(char));
         decrypt(plainText,cipherText,p);
-        strcpy(passwords[i],p);
+        strcpy(existingUsers[i].password,p);
     }
 }
 
@@ -169,4 +171,17 @@ void encrypt(char * plaintext, char * ciphertext, char password[]){
         int pos=p-plaintext;
         password[i]=ciphertext[pos];
     }
+}
+user createUser(){
+    user u;
+    u.username = (char *)malloc(MAX_USERNAME*sizeof(char));
+    u.password = (char *)malloc(MAX_USERNAME * sizeof(char));
+    return u;
+}
+void freeUsers(user * users, int noOfUsers){
+    for(int i=0;i<noOfUsers;i++) {
+        free(users[i].username);
+        free(users[i].password);
+    }
+    free(users);
 }
